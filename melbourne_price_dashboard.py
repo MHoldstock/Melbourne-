@@ -13,9 +13,20 @@ from xgboost import XGBRegressor
 # Load and preprocess data
 @st.cache_data
 def load_data():
-    df = pd.read_excel("melbourne property analysis.xlsx", sheet_name="Sheet1", skiprows=26)
-    df.columns = df.iloc[0]
-    df = df[1:]
+    # Try loading with fewer rows skipped
+    df = pd.read_excel("melbourne property analysis.xlsx", sheet_name="Sheet1", skiprows=25)
+
+    # Show columns to debug
+    st.write("🔍 Columns before fix:", df.columns.tolist())
+
+    # If "Price" is not found, try setting the first row as header
+    if 'Price' not in df.columns:
+        df.columns = df.iloc[0]
+        df = df[1:]
+
+    st.write("✅ Columns after fix:", df.columns.tolist())
+
+    # Clean up the data
     df = df.dropna(subset=["Price"])
     numeric_cols = ['Rooms', 'Price', 'Distance', 'Bedroom2', 'Bathroom', 'Car',
                     'Landsize', 'BuildingArea', 'YearBuilt', 'Lattitude', 'Longtitude']
